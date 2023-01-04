@@ -143,10 +143,22 @@ function Counter() {
    - `<h1>Now: {count}, before: {prevCount}</h1>` is converted to `<h1>Now: 0, before: undefined</h1>`, where `count` & `prevCount` are 0 and `undefined`, respectively.  
     ![useRef_6](https://user-images.githubusercontent.com/71059909/210556852-a6b3f413-f047-4842-a67f-c836eeef3d26.JPG)
     
-7.     
+7. `useEffect` inside `usePrevious` Hook is now invoked asynchronously after functional component is rendered, allowing browser to paint DOM changes.
+    ![useRef_7](https://user-images.githubusercontent.com/71059909/210606600-d41257b6-71d8-4508-aaf9-cdb26c1ae9b9.JPG)
+    - Below is the effect function.
+    ```
+    useEffect(() => {
+     ref.current = value;
+    },[value]);
+    
+    ```
+    - The line within the useEffect function updates the `current` property of the `ref` object to `value`.
+    - Custom hook is initially invoked, the value is 0. In this current flow, remember usePrevious has only been called once with the initial value of 0.
+    - In this case, the value is `0`. In this current flow, remember `usePrevious` has only been called once with the initial value of `0`.
 
+![useRef_8](https://user-images.githubusercontent.com/71059909/210615191-02788c5b-7c4d-4293-af7c-7fad89208fd4.JPG)
 
-
+8. 
 
  
 

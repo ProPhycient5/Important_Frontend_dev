@@ -89,5 +89,65 @@ function Count() {
  i.e., specialVariable.current = "NEW_SPECIAL_VARIABLE.
 ```
 
-So the above explanation throws some light about how `useRef` works. But next we will go step by step how the above code `usePrevious` custom hooks work.
+- So the above explanation throws some light about how `useRef` works. 
+- But next we will go step by step how the above code `usePrevious` custom hooks work.😏
+
+- Let us look at the below code again holistically.
+
+```
+// custom hook for getting previous value 
+function usePrevious(value) {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  },[value]);
+  return ref.current;
+}
+
+// the App where the hook is used 
+function Counter() {
+  const [count, setCount] = useState(0);
+  // 👇 look here
+  const prevCount = usePrevious(count)
+
+  return <h1>Now: {count}, before: {prevCount}</h1>;
+}
+```
+
+1. So when the `Counter`app is rendered for the first time.
+ - `useState` Hook is invoked.
+ - State variable `count` and its corresponding update function `setCount` are initiated.
+ - So, `count` = 0
+![useRef_1](https://user-images.githubusercontent.com/71059909/210546980-d32cf4e9-df5b-46eb-bc77-2ab613171236.JPG)
+
+2. Going by the line-by-line execution as default trait of `JS`.
+ - Custom hook `usePrevious` is invoked with the current value of `count` as 0.
+![useRef_2](https://user-images.githubusercontent.com/71059909/210548245-32391b3b-dc1d-4064-9c20-78d587694b25.JPG)
+
+3. As we know when any function is invoked, a brand new EC(excecution context) is created inside global EC.
+ -  React creates a new `useRef` instance.
+ -  The initial value of this Hook is `undefined` because the `current` key doesn’t exist at first place.
+ ![useRef_3](https://user-images.githubusercontent.com/71059909/210549425-47916aee-f342-4bfd-b4bf-6861d2a18fe2.JPG)
+ 
+4. This next step is quite crucial where most people overlook.
+ - React doesn’t execute the useEffect call, instead, the `return` is executed.
+ - `useEffect` Hook is invoked only after the component from which it is called has been rendered. 🙄
+ - Which also means the code(here it is `HTML`) inside the return scope of the component must be executed first.
+ ![useRef_4](https://user-images.githubusercontent.com/71059909/210553899-5d6f5a8e-b7f7-44f9-95e4-83ba51ec8228.JPG)
+
+5. Now in this step, the custom hook EC is executed and its corresponding EC is deleted and the control is back to the `return` statement. 
+   - `prevCount` variable holds the value as `undefined`.
+   ![useRef_5](https://user-images.githubusercontent.com/71059909/210555736-5a102ca4-3f9f-417a-aeee-6175f11e4d7e.JPG)
+   
+6. Here, the return value of the component is evaluated.
+   - `<h1>Now: {count}, before: {prevCount}</h1>` is converted to `<h1>Now: 0, before: undefined</h1>`, where `count` & `prevCount` are 0 and `undefined`, respectively.  
+    ![useRef_6](https://user-images.githubusercontent.com/71059909/210556852-a6b3f413-f047-4842-a67f-c836eeef3d26.JPG)
+    
+7.     
+
+
+
+
+ 
+
 

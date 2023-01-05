@@ -118,33 +118,40 @@ function Counter() {
  - `useState` Hook is invoked.
  - State variable `count` and its corresponding update function `setCount` are initiated.
  - So, `count` = 0
+
 ![useRef_1](https://user-images.githubusercontent.com/71059909/210546980-d32cf4e9-df5b-46eb-bc77-2ab613171236.JPG)
 
 2. Going by the line-by-line execution as default trait of `JS`.
  - Custom hook `usePrevious` is invoked with the current value of `count` as 0.
+
 ![useRef_2](https://user-images.githubusercontent.com/71059909/210548245-32391b3b-dc1d-4064-9c20-78d587694b25.JPG)
 
 3. As we know when any function is invoked, a brand new EC(excecution context) is created inside global EC.
  -  React creates a new `useRef` instance.
  -  The initial value of this Hook is `undefined` because the `current` key doesn’t exist at first place.
+ 
  ![useRef_3](https://user-images.githubusercontent.com/71059909/210549425-47916aee-f342-4bfd-b4bf-6861d2a18fe2.JPG)
  
 4. This next step is quite crucial where most people overlook.
  - React doesn’t execute the useEffect call, instead, the `return` is executed.
  - `useEffect` Hook is invoked only after the component from which it is called has been rendered. 🙄
  - Which also means the code(here it is `HTML`) inside the return scope of the component must be executed first.
+ 
  ![useRef_4](https://user-images.githubusercontent.com/71059909/210553899-5d6f5a8e-b7f7-44f9-95e4-83ba51ec8228.JPG)
 
 5. Now in this step, the custom hook EC is executed and its corresponding EC is deleted and the control is back to the `return` statement. 
    - `prevCount` variable holds the value as `undefined`.
+  
    ![useRef_5](https://user-images.githubusercontent.com/71059909/210555736-5a102ca4-3f9f-417a-aeee-6175f11e4d7e.JPG)
    
 6. Here, the return value of the component is evaluated.
-   - `<h1>Now: {count}, before: {prevCount}</h1>` is converted to `<h1>Now: 0, before: undefined</h1>`, where `count` & `prevCount` are 0 and `undefined`, respectively.  
+   - `<h1>Now: {count}, before: {prevCount}</h1>` is converted to `<h1>Now: 0, before: undefined</h1>`, where `count` & `prevCount` are 0 and `undefined`, respectively.
+     
     ![useRef_6](https://user-images.githubusercontent.com/71059909/210556852-a6b3f413-f047-4842-a67f-c836eeef3d26.JPG)
     
 7. `useEffect` inside `usePrevious` Hook is now invoked asynchronously after functional component is rendered, allowing browser to paint DOM changes.
-    ![useRef_7](https://user-images.githubusercontent.com/71059909/210606600-d41257b6-71d8-4508-aaf9-cdb26c1ae9b9.JPG)
+   
+   ![useRef_7](https://user-images.githubusercontent.com/71059909/210606600-d41257b6-71d8-4508-aaf9-cdb26c1ae9b9.JPG)
     - Below is the effect function.
     ```
     useEffect(() => {
@@ -153,12 +160,26 @@ function Counter() {
     
     ```
     - The line within the useEffect function updates the `current` property of the `ref` object to `value`.
-    - Custom hook is initially invoked, the value is 0. In this current flow, remember usePrevious has only been called once with the initial value of 0.
+    - Custom hook is initially invoked, the value is 0. In this current flow, remember `usePrevious` has only been called once with the initial value of 0.
     - In this case, the value is `0`. In this current flow, remember `usePrevious` has only been called once with the initial value of `0`.
 
 ![useRef_8](https://user-images.githubusercontent.com/71059909/210615191-02788c5b-7c4d-4293-af7c-7fad89208fd4.JPG)
 
-8. 
+8. Now, <kbd>ref</kbd> holds the value 0. When the <kbd>count</kbd> within the app is updated from 0 to 1, or to a new count, the app will run this piece of code again.
+
+9. <kbd>usePrevious</kbd> Hook is invoked with the new state value <kbd>1</kbd>. Then, the return statement is evaluated, returning <kbd>ref.current</kbd> as <kbd>0</kbd>, not <kbd>1</kbd> because the <kbd>ref</kbd> object isn’t updated yet.
+10. So, <kbd>ref.current</kbd> has previous value before the <kbd>useEffect</kbd> was triggered that is <kbd>0</kbd>. The return statement of the component is equally evaluated with the previous value successfully returned. 
+11. When the component is rendered completely, the <kbd>useEffect</kbd> is invoked within the <kbd>usePrevious</kbd> hook and updated with the value of <kbd>1</kbd>. Similaely, the cycle continues. This is the path how we have access of the previous value of a state variable using <kbd>usePrevious</kbd>.
+
+#### The Key takeaways from the above explanation how we access previous state value:
+a. The <kbd>ref</kbd> object will always return the same value held in <kbd>ref.current</kbd>, except when it is explicitly updated.
+b. <kbd>useEffect</kbd> is only called after the component is rendered with the previous value. Then only the <kbd>ref</kbd> object is updated within useEffect.
+
+
+
+
+
+
 
  
 
